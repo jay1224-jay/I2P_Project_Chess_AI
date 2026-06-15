@@ -89,59 +89,38 @@ int State::evaluate(
 
         int self_kr = -1, self_kc = -1;
         int oppn_kr = -1, oppn_kc = -1;
-        // [ Hackathon TODO 1-3 ]
-        // get the position for player's king and opponent's king
+        
         for ( int h = 0 ; h < BOARD_H ; ++h ) {
             for ( int w = 0 ; w < BOARD_W ; ++w ) {
-                if ( this->piece_at(this->player, h, w) == 6 ) {
-                    // found king
+                if ( self_board[h][w] == 6 ) {
                     self_kr = h;
                     self_kc = w;
                 }
-            }
-        }
-
-        for ( int h = 0 ; h < BOARD_H ; ++h ) {
-            for ( int w = 0 ; w < BOARD_W ; ++w ) {
-                if ( this->piece_at(1-this->player, h, w) == 6 ) {
-                    // found king
-                    oppn_kc = w;
+                if ( oppn_board[h][w] == 6 ) {
                     oppn_kr = h;
+                    oppn_kc = w;
                 }
             }
         }
 
-        if ( self_kr == -1 && self_kc == -1 ) {
-            return M_MAX;
-        }
-
-        if ( oppn_kr == -1 && oppn_kc == -1 ) {
-            // win
-            return P_MAX;
-        }
-
-        // [ Hackathon TODO 1-4 ]
-        // sum player/opponent pieces' value and add to score
-        // if enemy king is still on the board, you should also call king_tropism for your pieces and add the value to score
-        // king_tropism is already given above
+        if ( self_kr == -1 ) return M_MAX;
+        if ( oppn_kr == -1 ) return P_MAX;
 
         for ( int h = 0 ; h < BOARD_H ; ++h ) {
             for ( int w = 0 ; w < BOARD_W ; ++w ) {
                 int piece = self_board[h][w];
-                int matertial = kp_material[piece];
-                int pst_value = pst[piece][h][w];
-                int king_trop = king_tropism(piece, h, w, oppn_kr, oppn_kc);
-                self_score += matertial + pst_value + king_trop;
-            }
-        }
+                if (piece) {
+                    self_score += kp_material[piece];
+                    self_score += pst[piece-1][h][w];
+                    self_score += king_tropism(piece, h, w, oppn_kr, oppn_kc);
+                }
 
-        for ( int h = 0 ; h < BOARD_H ; ++h ) {
-            for ( int w = 0 ; w < BOARD_W ; ++w ) {
-                int piece = oppn_board[h][w];
-                int matertial = kp_material[piece];
-                int pst_value = pst[piece][BOARD_H - h][w];
-                int king_trop = king_tropism(piece, h, w, self_kr, self_kc);
-                oppn_score += matertial + pst_value + king_trop;
+                piece = oppn_board[h][w];
+                if (piece) {
+                    oppn_score += kp_material[piece];
+                    oppn_score += pst[piece-1][BOARD_H - 1 - h][w];
+                    oppn_score += king_tropism(piece, h, w, self_kr, self_kc);
+                }
             }
         }
 

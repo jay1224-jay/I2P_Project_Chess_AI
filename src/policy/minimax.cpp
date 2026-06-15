@@ -1,8 +1,7 @@
 #include <utility>
+#include <algorithm>
 #include "state.hpp"
 #include "minimax.hpp"
-
-#define max(a, b) (a > b ? a : b)
 
 /*============================================================
  * MiniMax — eval_ctx
@@ -13,7 +12,7 @@ int MiniMax::eval_ctx(
     State *state,
     int depth,
     GameHistory& history,
-    int ply, // number of play turns
+    int ply,
     SearchContext& ctx,
     const MMParams& p
 ){
@@ -31,15 +30,9 @@ int MiniMax::eval_ctx(
     }
 
     /* === Terminal / leaf checks === */
-
-    // [ Hackathon TODO 3-1 ]
-    // return the score for a winning terminal state
-    // Hint: prefer faster wins by using ply.
-
-    if (state->game_state == WIN ) {
+    if (state->game_state == WIN) {
         return P_MAX - ply;
     }
-
     if(state->game_state == DRAW){
         return 0;
     }
@@ -49,47 +42,38 @@ int MiniMax::eval_ctx(
     if(state->check_repetition(history, rep_score)){
         return rep_score;
     }
-    history.push(state->hash());
 
     if(depth <= 0){
-        int score = state->evaluate(
-            p.use_kp_eval, p.use_eval_mobility, &history
-        ); 
-        history.pop(state->hash());
-        return score;
+        return state->evaluate(p.use_kp_eval, p.use_eval_mobility, &history);
     }
 
     /* === Negamax loop === */
-    int best_score = M_MAX;
-
+    history.push(state->hash());
+    int best_score = M_MAX - 1;
+    
     for(auto& action : state->legal_actions){
-        // [ Hackathon TODO 3-2 ]
-        // create the child state after applying action
-
         State* next = state->next_state(action);
-
         bool same = next->same_player_as_parent();
-
-        // [Hackathon TODO 3-3]
-        // search the child one level deeper
-        int child_score = eval_ctx(next, depth - 1, history, ply+1, ctx, p);
-
         
-        // [Hackathon TODO 3-4]
-        // convert raw to the current player's perspective.
-
-        if ( !same ) {
-            child_score = -child_score;
+        int score = eval_ctx(next, depth - 1, history, ply + 1, ctx, p);
+        
+        if (!same) {
+            score = -score;
         }
-
         delete next;
 
-        // [ Hackathon TODO 3-5 ]
-        // update best_score if this child is better.
-        best_score = max(best_score, child_score);
+        if (score > best_score) {
+            best_score = score;
+        }
     }
 
     history.pop(state->hash());
+    
+    /* If no moves were made (and not handled by terminal checks), it's a loss */
+    if (best_score < M_MAX) {
+        return M_MAX + ply;
+    }
+
     return best_score;
 }
 
@@ -110,51 +94,46 @@ SearchResult MiniMax::search(
     SearchResult result;
     result.depth = depth;
 
-    if(!state->legal_actions.size()){
+    if(state->legal_actions.empty()){
         state->get_legal_actions();
     }
-
-
-    int best_score = M_MAX - 10;
-    int move_index = 0;
-    int total_moves = (int)state->legal_actions.size();
-
-    for(auto& action : state->legal_actions){
-        /* [ Hackathon TODO 4-1 ]
-         * search this move like TODO 3, but starting from the root */
-
-        State* next = state->next_state(action);
-
-        int score = eval_ctx(next, depth-1, history, 1, ctx, p);
-
-        bool same = next->same_player_as_parent();
-        if ( !same ) {
-            score = -score;
-        }
-
-        delete next;
-
-            if(score > best_score){
-                // [ Hackathon TODO 4-2 ]
-                // keep this move if it is the best so far
-                best_score = score;
-                result.best_move = action;
-                // result.depth = depth;
-                result.score = score;
-
-                if(p.report_partial && ctx.on_root_update){
-                   ctx.on_root_update({result.best_move, best_score, depth, move_index + 1, total_moves});
-                }
-            }  
-        move_index++;
+    if(state->legal_actions.empty()){
+        return result;
     }
 
-    // [ Hackathon TODO 4-3 ]
-    // update result and return
+    int best_score = M_MAX - 1;
+    int move_index = 0;
+    int total_moves = (int)state->legal_actions.size();
+    result.best_move = state->legal_actions[0]; // fallback
 
-    result.score = best_score;
-    result.depth = depth;
+    for(auto& action : state->legal_actions){
+        State* next = state->next_state(action);
+        bool same = next->same_player_as_parent();
+        
+        int score = eval_ctx(next, depth - 1, history, 1, ctx, p);
+        
+        if (!same) {
+            score = -score;
+        }
+        delete next;
 
+        if(score > best_score){
+            best_score = score;
+            result.best_move = action;
+            result.score = score;
+            result.pv.clear();
+            result.pv.push_back(action);
+
+            if(p.report_partial && ctx.on_root_update){
+                ctx.on_root_update({result.best_move, result.score, depth, move_index + 1, total_moves});
+            }
+        }  
+        move_index++;
+        if(ctx.stop) break;
+    }
+
+    result.nodes = ctx.nodes;
+    result.seldepth = ctx.seldepth;
     return result;
 } 
 
