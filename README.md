@@ -1,5 +1,12 @@
 # MiniChess Engine (6×5)
 
+## Roadmap
+
+- [x] **MiniMax**: Basic negamax search without pruning.
+- [ ] **AlphaBeta**: Alpha-beta pruning for increased search efficiency.
+- [ ] **PVS**: Principal Variation Search for further pruning.
+- [ ] **Quiescence**: Selective search extension to mitigate the horizon effect.
+
 A compact, game-agnostic board-game search engine. The game (MiniChess, played
 on a 6×5 board) lives behind an abstract `BaseState` interface; the search
 algorithms and the protocol layer contain **no** game-specific knowledge. The
