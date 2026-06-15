@@ -123,7 +123,7 @@ SearchResult MiniMax::search(
         /* [ Hackathon TODO 4-1 ]
          * search this move like TODO 3, but starting from the root */
 
-        auto next = state->next_state(action);
+        State* next = state->next_state(action);
 
         int score = eval_ctx(next, depth-1, history, 1, ctx, p);
 
@@ -139,7 +139,7 @@ SearchResult MiniMax::search(
                 // keep this move if it is the best so far
                 best_score = score;
                 result.best_move = action;
-                result.depth = depth;
+                // result.depth = depth;
                 result.score = score;
 
                 if(p.report_partial && ctx.on_root_update){

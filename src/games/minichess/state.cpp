@@ -23,8 +23,12 @@ static const int simple_material[7] = {0, 2, 6, 7, 8, 20, 100};
 // Piece-Square Tables (white perspective, mirror for black)
 static const int pst[6][BOARD_H][BOARD_W] = {
     // Pawn
-    {{ 0,  0,  0,  0,  0}, {15, 15, 15, 15, 15}, { 4,  6, 10,  6,  4},
-     { 2,  4,  6,  4,  2}, { 0,  2,  2,  2,  0}, { 0,  0,  0,  0,  0}},
+    {{ 0,  0,  0,  0,  0}, 
+     {15, 15, 15, 15, 15}, 
+     { 4,  6, 10,  6,  4},
+     { 2,  4,  6,  4,  2}, 
+     { 0,  2,  2,  2,  0}, 
+     { 0,  0,  0,  0,  0}},
     // Rook
     {{ 2,  2,  2,  2,  2}, { 4,  4,  4,  4,  4}, { 0,  0,  2,  0,  0},
      { 0,  0,  2,  0,  0}, { 0,  0,  2,  0,  0}, { 0,  0,  0,  0,  0}},
@@ -124,14 +128,20 @@ int State::evaluate(
         for ( int h = 0 ; h < BOARD_H ; ++h ) {
             for ( int w = 0 ; w < BOARD_W ; ++w ) {
                 int piece = self_board[h][w];
-                self_score += simple_material[piece] + king_tropism(piece, h, w, oppn_kr, oppn_kc);
+                int matertial = kp_material[piece];
+                int pst_value = pst[piece][h][w];
+                int king_trop = king_tropism(piece, h, w, oppn_kr, oppn_kc);
+                self_score += matertial + pst_value + king_trop;
             }
         }
 
         for ( int h = 0 ; h < BOARD_H ; ++h ) {
             for ( int w = 0 ; w < BOARD_W ; ++w ) {
-                int piece = self_board[h][w];
-                oppn_score += simple_material[piece] + king_tropism(piece, h, w, self_kr, self_kc);;
+                int piece = oppn_board[h][w];
+                int matertial = kp_material[piece];
+                int pst_value = pst[piece][BOARD_H - h][w];
+                int king_trop = king_tropism(piece, h, w, self_kr, self_kc);
+                oppn_score += matertial + pst_value + king_trop;
             }
         }
 
@@ -166,6 +176,12 @@ int State::evaluate(
         // bonus += 2 * (self_mobility - oppn_mobility);
 
         int self_mobility = this->legal_actions.size(), oppn_mobility = 0;
+
+        BaseState* oppn_state = create_null_state();
+        if ( oppn_state != nullptr ) {
+            oppn_mobility = oppn_state->legal_actions.size();
+            delete oppn_state;
+        }
 
         bonus += 2 * (self_mobility - oppn_mobility);
 
