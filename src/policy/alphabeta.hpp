@@ -28,7 +28,6 @@ public:
         SearchContext& ctx,
         const ABParams& p
     );
-
     static SearchResult search(
         State *state,
         int depth,
