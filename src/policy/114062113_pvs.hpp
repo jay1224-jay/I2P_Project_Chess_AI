@@ -1,14 +1,14 @@
 #pragma once
 #include "search_types.hpp"
-#include "game_history.hpp"
+#include "114062113_game_history.hpp"
 
-struct ABParams {
+struct PVSParams {
     bool use_kp_eval = true;
     bool use_eval_mobility = true;
     bool report_partial = true;
 
-    static ABParams from_map(const ParamMap& m){
-        ABParams p;
+    static PVSParams from_map(const ParamMap& m){
+        PVSParams p;
         p.use_kp_eval       = param_bool(m, "UseKPEval", true);
         p.use_eval_mobility = param_bool(m, "UseEvalMobility", true);
         p.report_partial    = param_bool(m, "ReportPartial", true);
@@ -16,7 +16,7 @@ struct ABParams {
     }
 };
 
-class AlphaBeta {
+class PVS {
 public:
     static int eval_ctx(
         State *state,
@@ -26,7 +26,7 @@ public:
         GameHistory& history,
         int ply,
         SearchContext& ctx,
-        const ABParams& p
+        const PVSParams& p
     );
     static SearchResult search(
         State *state,

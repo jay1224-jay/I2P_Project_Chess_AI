@@ -1,31 +1,46 @@
 #pragma once
 #include "search_types.hpp"
-#include "game_history.hpp"
+#include "114062113_game_history.hpp"
 
-struct MMParams {
+struct SubmissionParams {
     bool use_kp_eval = true;
     bool use_eval_mobility = true;
     bool report_partial = true;
+    bool use_quiescence = true;
 
-    static MMParams from_map(const ParamMap& m){
-        MMParams p;
+    static SubmissionParams from_map(const ParamMap& m){
+        SubmissionParams p;
         p.use_kp_eval       = param_bool(m, "UseKPEval", true);
         p.use_eval_mobility = param_bool(m, "UseEvalMobility", true);
         p.report_partial    = param_bool(m, "ReportPartial", true);
+        p.use_quiescence    = param_bool(m, "UseQuiescence", true);
         return p;
     }
 };
 
-class MiniMax{
+class Submission {
 public:
     static int eval_ctx(
         State *state,
         int depth,
+        int alpha,
+        int beta,
         GameHistory& history,
         int ply,
         SearchContext& ctx,
-        const MMParams& p
+        const SubmissionParams& p
     );
+
+    static int quiescence(
+        State *state,
+        int alpha,
+        int beta,
+        GameHistory& history,
+        int ply,
+        SearchContext& ctx,
+        const SubmissionParams& p
+    );
+
     static SearchResult search(
         State *state,
         int depth,

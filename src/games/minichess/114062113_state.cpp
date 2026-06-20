@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <cstdlib>
 
-#include "./state.hpp"
+#include "./114062113_state.hpp"
 #include "config.hpp"
-#include "../../policy/game_history.hpp"
+#include "../../policy/114062113_game_history.hpp"
 
 
 /*============================================================

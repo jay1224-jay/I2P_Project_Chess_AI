@@ -12,12 +12,12 @@
 #include <functional>
 #include <vector>
 #include "search_types.hpp"
-#include "game_history.hpp"
-#include "minimax.hpp"
+#include "114062113_game_history.hpp"
+#include "114062113_minimax.hpp"
 #include "random.hpp"
-#include "alphabeta.hpp"
-#include "submission.hpp"
-#include "pvs.hpp"
+#include "114062113_alphabeta.hpp"
+#include "114062113_submission.hpp"
+#include "114062113_pvs.hpp"
 
 struct AlgoEntry {
     std::string name;

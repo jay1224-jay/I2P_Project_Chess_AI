@@ -3,9 +3,9 @@
 #include <iomanip>
 
 #include "config.hpp"
-#include "state.hpp"
-#include "./policy/registry.hpp"
-#include "./policy/game_history.hpp"
+#include "114062113_state.hpp"
+#include "./policy/114062113_registry.hpp"
+#include "./policy/114062113_game_history.hpp"
 
 
 /* === Test position === */

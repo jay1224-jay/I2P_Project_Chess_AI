@@ -1,6 +1,6 @@
 #pragma once
 #include "search_types.hpp"
-#include "game_history.hpp"
+#include "114062113_game_history.hpp"
 
 class Random{
 public:

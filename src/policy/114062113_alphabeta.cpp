@@ -1,7 +1,7 @@
 #include <utility>
 #include <algorithm>
-#include "state.hpp"
-#include "alphabeta.hpp"
+#include "114062113_state.hpp"
+#include "114062113_alphabeta.hpp"
 
 int AlphaBeta::eval_ctx(
     State *state, int depth, int alpha, int beta,

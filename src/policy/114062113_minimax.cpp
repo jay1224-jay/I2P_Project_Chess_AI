@@ -1,7 +1,7 @@
 #include <utility>
 #include <algorithm>
-#include "state.hpp"
-#include "minimax.hpp"
+#include "114062113_state.hpp"
+#include "114062113_minimax.hpp"
 
 /*============================================================
  * MiniMax — eval_ctx
